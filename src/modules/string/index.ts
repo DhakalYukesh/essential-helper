@@ -6,7 +6,7 @@
 export function toCamelCase(str: string): string {
     const normalized = str.replace(/[-_]/g, ' ');
 
-    let value = normalized.replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
+    const value = normalized.replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
         return index === 0 ? letter.toLowerCase() : letter.toUpperCase();
     });
     return value.replace(/\s+/g, '');
@@ -20,7 +20,7 @@ export function toCamelCase(str: string): string {
 export function toKebabCase(str: string): string {
     const normalized = str.replace(/[-_]/g, ' ');
 
-    let value = normalized.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    const value = normalized.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
     return value.replace(/\s+/g, '-');
 }
 
@@ -32,7 +32,7 @@ export function toKebabCase(str: string): string {
 export function toSnakeCase(str: string): string {
     const normalized = str.replace(/[-_]/g, ' ');
 
-    let value = normalized.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+    const value = normalized.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
     return value.replace(/\s+/g, '_');
 }
 
@@ -44,7 +44,7 @@ export function toSnakeCase(str: string): string {
 export function toPascalCase(str: string): string {
     const normalized = str.replace(/[-_]/g, ' ');
 
-    let value = normalized.replace(/(?:^\w|[A-Z]|\b\w)/g, (letter) => {
+    const value = normalized.replace(/(?:^\w|[A-Z]|\b\w)/g, (letter) => {
         return letter.toUpperCase();
     });
     return value.replace(/\s+/g, '');

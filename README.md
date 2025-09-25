@@ -248,7 +248,7 @@ MIT © [Yukesh Dhakal](https://github.com/DhakalYukesh)
 
 ## Changelog
 
-### 1.1.0 (Current)
+### 1.1.1 (Current)
 - String manipulation functions (camelCase, kebab-case, snake_case, PascalCase)
 - Text transformation utilities (capitalizeWords, reverseString)
 - Base64 encoding/decoding

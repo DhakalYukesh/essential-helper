@@ -1,6 +1,6 @@
 {
   "name": "essential-helper",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A collection of essential helper functions for JavaScript and TypeScript projects.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -37,6 +37,7 @@
   "homepage": "https://github.com/DhakalYukesh/essential-helper#readme",
   "type": "commonjs",
   "devDependencies": {
+    "@eslint/js": "^9.36.0",
     "@types/jest": "^30.0.0",
     "@typescript-eslint/eslint-plugin": "^8.44.1",
     "@typescript-eslint/parser": "^8.44.1",
@@ -49,6 +50,7 @@
     "rimraf": "^6.0.1",
     "ts-jest": "^29.4.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.44.1"
   }
 }
