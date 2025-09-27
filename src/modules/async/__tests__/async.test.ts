@@ -1,4 +1,4 @@
-import { delay, retry } from '../index';
+import { delay, retry, tryWrap } from '../index';
 
 describe('Async Utilities', () => {
     describe('delay', () => {
@@ -30,6 +30,20 @@ describe('Async Utilities', () => {
             const fn = jest.fn().mockRejectedValue(new Error('Always fails'));
             await expect(retry(fn, 3, 100)).rejects.toThrow('Always fails');
             expect(fn).toHaveBeenCalledTimes(3);
+        });
+    });
+
+    describe('tryWrap', () => {
+        it('should return [null, data] when the promise resolves', async () => {
+            const p = Promise.resolve('data');
+            const result = await tryWrap(p);
+            expect(result).toEqual([null, 'data']);
+        });
+
+        it('should return [error, null] when the promise rejects', async () => {
+            const p = Promise.reject(new Error('Failed'));
+            const result = await tryWrap(p);
+            expect(result).toEqual([new Error('Failed'), null]);
         });
     });
 });

@@ -34,3 +34,17 @@ export async function retry<T>(
 
     throw lastError!;
 }
+
+/**
+ * Wraps a promise and returns a tuple containing either the resolved value or an error.
+ * @param p - The promise to be wrapped.
+ * @returns A promise that resolves to a tuple [Error | null, T | null].
+ */
+export async function tryWrap<T>(p: Promise<T>): Promise<[Error | null, T | null]> {
+    try {
+        const data = await p;
+        return [null, data];
+    } catch (error) {
+        return [error as Error, null];
+    }
+}

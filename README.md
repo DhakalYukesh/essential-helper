@@ -1,6 +1,6 @@
 # essential-helper
 
-A collection of essential helper functions for JavaScript and TypeScript projects. This library provides utilities for string manipulation, encoding/decoding operations, asynchronous operations, and password management.
+A collection of essential helper functions for JavaScript and TypeScript projects. This library provides utilities for string manipulation, encoding/decoding operations, asynchronous operations, password management, and core application utilities.
 
 ## Installation
 
@@ -11,7 +11,15 @@ npm install essential-helper
 ## Usage
 
 ```typescript
-import { toCamelCase, encodeToBase64, delay, hashPassword } from 'essential-helper';
+import { 
+    toCamelCase, 
+    encodeToBase64, 
+    delay, 
+    hashPassword, 
+    createResponse, 
+    paginate,
+    logger 
+} from 'essential-helper';
 
 // String manipulation
 const result = toCamelCase('hello-world'); // 'helloWorld'
@@ -24,6 +32,15 @@ await delay(1000); // Wait for 1 second
 
 // Password hashing
 const hashedPassword = await hashPassword('myPassword123!');
+
+// API Response
+const response = createResponse({ id: 1, name: 'John' }, 'User found', 200);
+
+// Pagination
+const paginatedData = paginate([1,2,3,4,5], 1, 2);
+
+// Logging
+logger('Application started', 'info');
 ```
 
 ## API Reference
@@ -188,6 +205,22 @@ const result = await retry(async () => {
 const result2 = await retry(someAsyncFunction, 5, 0);
 ```
 
+#### `tryWrap<T>(p: Promise<T>): Promise<[Error | null, T | null]>`
+
+Wraps a promise and returns a tuple containing either the resolved value or an error.
+
+```typescript
+import { tryWrap } from 'essential-helper';
+
+const [error, data] = await tryWrap(fetch('/api/data'));
+
+if (error) {
+    console.error('Request failed:', error.message);
+} else {
+    console.log('Request succeeded:', data);
+}
+```
+
 ### Password Functions
 
 #### `hashPassword(password: string): Promise<string>`
@@ -237,7 +270,221 @@ const isWeak = await validatePasswordStrength('password');
 console.log(isWeak); // false
 ```
 
+### Core Functions
+
+#### `createResponse<T>(data: T, message?: string, status?: number)`
+
+Creates a standardized response object for APIs.
+
+```typescript
+import { createResponse } from 'essential-helper';
+
+// Default response
+const response = createResponse({ id: 1, name: 'John' });
+// { status: 200, message: 'OK', data: { id: 1, name: 'John' } }
+
+// Custom response
+const errorResponse = createResponse(null, 'User not found', 404);
+// { status: 404, message: 'User not found', data: null }
+```
+
+#### `requiredEnv(varName: string): string`
+
+Retrieves the value of an environment variable, throwing an error if it is not set.
+
+```typescript
+import { requiredEnv } from 'essential-helper';
+
+// Will throw error if DATABASE_URL is not set
+const databaseUrl = requiredEnv('DATABASE_URL');
+
+// Usage in configuration
+const config = {
+    port: process.env.PORT || 3000,
+    databaseUrl: requiredEnv('DATABASE_URL'), // Required
+    apiKey: requiredEnv('API_KEY') // Required
+};
+```
+
+#### `paginate<T>(items: T[], page?: number, perPage?: number)`
+
+Paginates an array of items with metadata.
+
+```typescript
+import { paginate } from 'essential-helper';
+
+const items = Array.from({ length: 100 }, (_, i) => ({ id: i + 1 }));
+
+// Default pagination (page 1, 20 items per page)
+const result = paginate(items);
+console.log(result);
+// {
+//   data: [{ id: 1 }, { id: 2 }, ...], // First 20 items
+//   meta: {
+//     total: 100,
+//     page: 1,
+//     perPage: 20,
+//     totalPages: 5
+//   }
+// }
+
+// Custom pagination
+const customResult = paginate(items, 2, 10);
+// Page 2 with 10 items per page
+```
+
+#### `logger(message: string, level?: 'info' | 'warn' | 'error')`
+
+Logs a message with a timestamp and specified log level using colored output.
+
+```typescript
+import { logger } from 'essential-helper';
+
+logger('Application started'); // Default: info level
+logger('Warning: API rate limit approaching', 'warn');
+logger('Database connection failed', 'error');
+```
+
+#### `singleInstance<T>(createInstance: () => T): () => T`
+
+Ensures a function is only executed once and returns the same instance on subsequent calls (Singleton pattern).
+
+```typescript
+import { singleInstance } from 'essential-helper';
+
+class DatabaseConnection {
+    constructor() {
+        console.log('Creating database connection...');
+    }
+}
+
+const getDbConnection = singleInstance(() => new DatabaseConnection());
+
+const db1 = getDbConnection(); // Creates new instance
+const db2 = getDbConnection(); // Returns same instance
+console.log(db1 === db2); // true
+```
+
+#### `properDate(date: Date, locale?: string, options?: Intl.DateTimeFormatOptions): string`
+
+Formats a Date object into a readable string based on locale and options.
+
+```typescript
+import { properDate } from 'essential-helper';
+
+const date = new Date('2024-01-15T10:30:00Z');
+
+// Default formatting (en-US)
+console.log(properDate(date)); // "1/15/2024"
+
+// Custom locale
+console.log(properDate(date, 'de-DE')); // "15.1.2024"
+
+// Custom options
+console.log(properDate(date, 'en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+})); // "January 15, 2024 at 10:30 AM"
+```
+
 ## Examples
+
+### API Response Standardization
+
+```typescript
+import { createResponse, logger } from 'essential-helper';
+
+async function getUserById(id: string) {
+    try {
+        logger(`Fetching user with ID: ${id}`, 'info');
+        
+        const user = await database.findUser(id);
+        
+        if (!user) {
+            return createResponse(null, 'User not found', 404);
+        }
+        
+        return createResponse(user, 'User retrieved successfully', 200);
+    } catch (error) {
+        logger(`Error fetching user: ${error.message}`, 'error');
+        return createResponse(null, 'Internal server error', 500);
+    }
+}
+```
+
+### Environment Configuration
+
+```typescript
+import { requiredEnv, logger } from 'essential-helper';
+
+function loadConfiguration() {
+    try {
+        const config = {
+            port: process.env.PORT || 3000,
+            databaseUrl: requiredEnv('DATABASE_URL'),
+            jwtSecret: requiredEnv('JWT_SECRET'),
+            apiKey: requiredEnv('API_KEY')
+        };
+        
+        logger('Configuration loaded successfully', 'info');
+        return config;
+    } catch (error) {
+        logger(`Configuration error: ${error.message}`, 'error');
+        process.exit(1);
+    }
+}
+```
+
+### Data Pagination with Error Handling
+
+```typescript
+import { paginate, tryWrap, logger } from 'essential-helper';
+
+async function getUsers(page = 1, limit = 10) {
+    const [error, users] = await tryWrap(database.getAllUsers());
+    
+    if (error) {
+        logger(`Database error: ${error.message}`, 'error');
+        return { error: 'Failed to fetch users' };
+    }
+    
+    const paginatedData = paginate(users, page, limit);
+    logger(`Retrieved ${paginatedData.data.length} users (page ${page})`, 'info');
+    
+    return paginatedData;
+}
+```
+
+### Singleton Database Connection
+
+```typescript
+import { singleInstance, logger, requiredEnv } from 'essential-helper';
+
+class DatabaseManager {
+    private connection: any;
+    
+    constructor() {
+        const dbUrl = requiredEnv('DATABASE_URL');
+        logger('Initializing database connection...', 'info');
+        this.connection = this.createConnection(dbUrl);
+    }
+    
+    private createConnection(url: string) {
+        // Database connection logic
+        return { url, connected: true };
+    }
+}
+
+// Ensure only one database instance
+const getDatabase = singleInstance(() => new DatabaseManager());
+
+// Usage across your application
+const db1 = getDatabase(); // Creates instance
+const db2 = getDatabase(); // Returns same instance
+```
 
 ### String Case Conversion
 
@@ -273,7 +520,7 @@ console.log(originalData === sensitiveData); // true
 ### Async Operations with Retry Logic
 
 ```typescript
-import { retry, delay } from 'essential-helper';
+import { retry, delay, tryWrap } from 'essential-helper';
 
 async function fetchWithRetry() {
     return retry(async () => {
@@ -285,10 +532,15 @@ async function fetchWithRetry() {
     }, 3, 1000); // 3 attempts with 1 second delay
 }
 
-async function processData() {
-    console.log('Starting process...');
-    await delay(1000); // Wait 1 second
-    console.log('Process completed!');
+async function safeAsyncOperation() {
+    const [error, result] = await tryWrap(fetchWithRetry());
+    
+    if (error) {
+        logger(`Operation failed: ${error.message}`, 'error');
+        return null;
+    }
+    
+    return result;
 }
 ```
 
@@ -333,6 +585,7 @@ import type { } from 'essential-helper'; // Types are included
 // All functions have full type safety
 const result: string = toCamelCase('hello-world');
 const hashedPassword: Promise<string> = hashPassword('myPassword');
+const response = createResponse<User>(userData, 'Success', 200);
 ```
 
 ## Requirements
@@ -391,9 +644,11 @@ MIT © [Yukesh Dhakal](https://github.com/DhakalYukesh)
 
 ## Changelog
 
-### 1.2.0 (Current)
-- **NEW**: Async utilities (`delay`, `retry`)
-- **NEW**: Password management functions (`hashPassword`, `comparePassword`, `generateRandomPassword`, `validatePasswordStrength`)
+### 1.3.0 (Current)
+- **NEW**: Core utilities (`createResponse`, `requiredEnv`, `paginate`, `logger`, `singleInstance`, `properDate`)
+- **NEW**: Enhanced async utilities (`tryWrap` function added)
+- Async utilities (`delay`, `retry`)
+- Password management functions (`hashPassword`, `comparePassword`, `generateRandomPassword`, `validatePasswordStrength`)
 - String manipulation functions (camelCase, kebab-case, snake_case, PascalCase)
 - Text transformation utilities (capitalizeWords, reverseString) 
 - Base64 encoding/decoding
@@ -401,8 +656,13 @@ MIT © [Yukesh Dhakal](https://github.com/DhakalYukesh)
 - Full TypeScript support
 - Comprehensive test coverage
 
+### 1.2.0
+- **NEW**: Async utilities (`delay`, `retry`)
+- **NEW**: Password management functions
+- String manipulation and encoding functions
+- Full TypeScript support
+
 ### 1.1.1
-- String manipulation functions
+- Initial release with string manipulation functions
 - Base64 and URL encoding/decoding
 - Full TypeScript support
-- 100% test coverage
