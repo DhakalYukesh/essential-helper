@@ -8,11 +8,11 @@ const pc = require('picocolors');
  * @return An object containing the status, message, and data.
  */
 export function createResponse<T>(data: T, message: string = 'OK', status: number = 200) {
-    return {
-        status,
-        message,
-        data,
-    };
+  return {
+    status,
+    message,
+    data,
+  };
 }
 
 /**
@@ -22,9 +22,9 @@ export function createResponse<T>(data: T, message: string = 'OK', status: numbe
  * @throws An error if the environment variable is not set.
  */
 export function requiredEnv(varName: string): string {
-    const value = process.env[varName];
-    if (!value) throw new Error(`Environment variable ${varName} is required but not set.`);
-    return value;
+  const value = process.env[varName];
+  if (!value) throw new Error(`Environment variable ${varName} is required but not set.`);
+  return value;
 }
 
 /** Paginates an array of items.
@@ -34,18 +34,18 @@ export function requiredEnv(varName: string): string {
  * @returns An object containing the paginated data and metadata.
  */
 export function paginate<T>(items: T[], page: number = 1, perPage: number = 20) {
-    const total = items.length;
-    const totalPages = Math.ceil(total / perPage);
-    const start = (page - 1) * perPage;
-    return {
-        data: items.slice(start, start + perPage),
-        meta: {
-            total,
-            page,
-            perPage,
-            totalPages,
-        },
-    };
+  const total = items.length;
+  const totalPages = Math.ceil(total / perPage);
+  const start = (page - 1) * perPage;
+  return {
+    data: items.slice(start, start + perPage),
+    meta: {
+      total,
+      page,
+      perPage,
+      totalPages,
+    },
+  };
 }
 
 /** Logs a message with a timestamp and specified log level.
@@ -53,17 +53,18 @@ export function paginate<T>(items: T[], page: number = 1, perPage: number = 20) 
  * @param level - The log level ('info', 'warn', 'error'). Default is 'info'.
  */
 export function logger(message: string, level: 'info' | 'warn' | 'error' = 'info') {
-    const colors = {
-        info: pc.cyan,
-        warn: pc.yellow,
-        error: pc.red,
-    }
-    const timestamp = new Date().toISOString();
-    const line = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
-    const method = level === 'error' ? console.error
-                : level === 'warn' ? console.warn
-                : console.log;
-    method(colors[level](line));
+  const colors = {
+    info: pc.cyan,
+    warn: pc.yellow,
+    error: pc.red,
+  };
+
+  const timestamp = new Date().toISOString();
+  const levelTag = `[${colors[level](level.toUpperCase())}]`;
+  const line = `[${timestamp}] ${levelTag} ${message}`;
+
+  const method = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
+  method(line);
 }
 
 /** Ensures a function is only executed once and returns the same instance on subsequent calls.
@@ -71,13 +72,13 @@ export function logger(message: string, level: 'info' | 'warn' | 'error' = 'info
  * @returns A function that returns the single instance.
  */
 export function singleInstance<T>(createInstance: () => T): () => T {
-    let instance: T | null = null;
-    return () => {
-        if (!instance) {
-            instance = createInstance();
-        }
-        return instance;
-    };
+  let instance: T | null = null;
+  return () => {
+    if (!instance) {
+      instance = createInstance();
+    }
+    return instance;
+  };
 }
 
 /** Formats a Date object into a readable string based on locale and options.
@@ -86,6 +87,10 @@ export function singleInstance<T>(createInstance: () => T): () => T {
  * @param options - The options for formatting (default is undefined).
  * @returns The formatted date string.
  */
-export function  properDate(date: Date, locale: string = 'en-US', options?: Intl.DateTimeFormatOptions): string {
-    return date.toLocaleDateString(locale, options);
+export function properDate(
+  date: Date,
+  locale: string = 'en-US',
+  options?: Intl.DateTimeFormatOptions
+): string {
+  return date.toLocaleDateString(locale, options);
 }

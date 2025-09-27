@@ -644,11 +644,16 @@ MIT © [Yukesh Dhakal](https://github.com/DhakalYukesh)
 
 ## Changelog
 
-### 1.3.0 (Current)
-- **NEW**: Core utilities (`createResponse`, `requiredEnv`, `paginate`, `logger`, `singleInstance`, `properDate`)
-- **NEW**: Enhanced async utilities (`tryWrap` function added)
-- Async utilities (`delay`, `retry`)
-- Password management functions (`hashPassword`, `comparePassword`, `generateRandomPassword`, `validatePasswordStrength`)
+### 1.3.1 (Current)
+- Updated picocolors dependency to version 1.1.1
+- Minor bug fixes and improvements
+- All existing functionality remains unchanged
+
+### 1.3.0
+- **NEW**: Core utilities ([`createResponse`](src/modules/core/index.ts), [`requiredEnv`](src/modules/core/index.ts), [`paginate`](src/modules/core/index.ts), [`logger`](src/modules/core/index.ts), [`singleInstance`](src/modules/core/index.ts), [`properDate`](src/modules/core/index.ts))
+- **NEW**: Enhanced async utilities ([`tryWrap`](src/modules/async/index.ts) function added)
+- Async utilities ([`delay`](src/modules/async/index.ts), [`retry`](src/modules/async/index.ts))
+- Password management functions ([`hashPassword`](src/modules/password/index.ts), [`comparePassword`](src/modules/password/index.ts), [`generateRandomPassword`](src/modules/password/index.ts), [`validatePasswordStrength`](src/modules/password/index.ts))
 - String manipulation functions (camelCase, kebab-case, snake_case, PascalCase)
 - Text transformation utilities (capitalizeWords, reverseString) 
 - Base64 encoding/decoding
@@ -657,7 +662,7 @@ MIT © [Yukesh Dhakal](https://github.com/DhakalYukesh)
 - Comprehensive test coverage
 
 ### 1.2.0
-- **NEW**: Async utilities (`delay`, `retry`)
+- **NEW**: Async utilities ([`delay`](src/modules/async/index.ts), [`retry`](src/modules/async/index.ts))
 - **NEW**: Password management functions
 - String manipulation and encoding functions
 - Full TypeScript support
